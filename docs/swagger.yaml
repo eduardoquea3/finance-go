@@ -1,0 +1,58 @@
+basePath: /
+host: localhost:8080
+info:
+  contact: {}
+  description: API financiera construida con Go y Gin.
+  title: Finance Go API
+  version: "1.0"
+paths:
+  /api/v1/me:
+    get:
+      description: Returns the subject from the bearer token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Current user
+      tags:
+      - users
+  /health:
+    get:
+      description: Checks whether the API can reach the database.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - system
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
