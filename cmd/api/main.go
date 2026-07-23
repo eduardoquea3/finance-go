@@ -7,14 +7,15 @@ import (
 	_ "github.com/eduardoquea3/finance-go/docs"
 	"github.com/eduardoquea3/finance-go/internal/auth"
 	"github.com/eduardoquea3/finance-go/internal/config"
-	"github.com/eduardoquea3/finance-go/internal/database"
-	"github.com/eduardoquea3/finance-go/internal/httpapi"
+	httpapi "github.com/eduardoquea3/finance-go/internal/http"
+	"github.com/eduardoquea3/finance-go/internal/platform/database"
+	"github.com/eduardoquea3/finance-go/internal/platform/token"
+	"github.com/eduardoquea3/finance-go/internal/user"
 )
 
 // @title Finance Go API
 // @version 1.0
 // @description API financiera construida con Go y Gin.
-// @host localhost:8080
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header
@@ -30,8 +31,10 @@ func main() {
 		log.Fatalf("open database: %v", err)
 	}
 
-	tokenService := auth.NewTokenService(cfg.JWTSecret, cfg.JWTIssuer, cfg.JWTTTL)
-	router := httpapi.NewRouter(db, tokenService)
+	tokenService := token.NewService(cfg.JWTSecret, cfg.JWTIssuer, cfg.JWTTTL)
+	users := user.NewPostgresRepository(db)
+	authHandler := auth.NewHTTPHandler(auth.NewService(users, tokenService))
+	router := httpapi.NewRouter(db, authHandler, tokenService)
 	server := &http.Server{Addr: cfg.HTTPAddress, Handler: router}
 
 	log.Printf("API listening on %s", cfg.HTTPAddress)

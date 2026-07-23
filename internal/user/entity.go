@@ -1,8 +1,8 @@
-package models
+package user
 
 import "time"
 
-type User struct {
+type Entity struct {
 	ID           uint      `gorm:"primaryKey"`
 	Email        string    `gorm:"uniqueIndex;not null"`
 	PasswordHash string    `gorm:"not null"`
@@ -10,4 +10,4 @@ type User struct {
 	UpdatedAt    time.Time `gorm:"not null"`
 }
 
-func (User) TableName() string { return "users" }
+func (Entity) TableName() string { return "users" }
