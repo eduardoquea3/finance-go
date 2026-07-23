@@ -12,8 +12,9 @@ import (
 )
 
 func main() {
-	direction := flag.String("direction", "up", "migration direction: up or down")
+	direction := flag.String("direction", "up", "migration direction: up, down, or force")
 	steps := flag.Int("steps", 1, "number of migrations for down")
+	version := flag.Int("version", 0, "version used with force")
 	flag.Parse()
 
 	_ = godotenv.Load()
@@ -34,6 +35,11 @@ func main() {
 		err = migrator.Up()
 	case "down":
 		err = migrator.Steps(-*steps)
+	case "force":
+		if *version < 0 {
+			log.Fatal("version must be zero or greater")
+		}
+		err = migrator.Force(*version)
 	default:
 		log.Fatalf("unsupported direction %q", *direction)
 	}
